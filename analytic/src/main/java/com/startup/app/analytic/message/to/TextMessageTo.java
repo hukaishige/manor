@@ -1,9 +1,10 @@
-package com.startup.app.analytic.message;
+package com.startup.app.analytic.message.to;
 
+import com.startup.app.analytic.message.BaseMessage;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("xml")
-public class TextMessage extends BaseMessage{
+public class TextMessageTo extends BaseMessage{
 
 	@XStreamAlias("Content")
 	private String content;

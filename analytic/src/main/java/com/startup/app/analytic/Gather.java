@@ -3,8 +3,10 @@ package com.startup.app.analytic;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +20,20 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.startup.app.analytic.message.TextMessage;
+import com.startup.app.analytic.message.BaseMessage;
+import com.startup.app.analytic.message.EventType;
+import com.startup.app.analytic.message.MessageType;
+import com.startup.app.analytic.message.from.LinkMessageFrom;
+import com.startup.app.analytic.message.from.PictureMessageFrom;
+import com.startup.app.analytic.message.from.SubscribeMessage;
+import com.startup.app.analytic.message.from.TextMessageFrom;
+import com.startup.app.analytic.message.from.VideoMessageFrom;
+import com.startup.app.analytic.message.from.VoiceMessageFrom;
+import com.startup.app.analytic.message.to.ImageAndTextMessageTo;
+import com.startup.app.analytic.message.to.PictureMessageTo;
+import com.startup.app.analytic.message.to.TextMessageTo;
+import com.startup.app.analytic.message.to.VideoMessageTo;
+import com.startup.app.analytic.message.to.VoiceMessageTo;
 
 @RestController
 @RequestMapping("/service")
@@ -38,28 +53,106 @@ public class Gather {
 		@RequestMapping(value="verify",method = RequestMethod.POST)
 		public void processMessage(HttpServletRequest request, HttpServletResponse response, @RequestParam Map<String, Object> allParams) {  
  
-			TextMessage msg = null;
 			try {
 				InputStream msgStream  = request.getInputStream();
+				BaseMessage msg = null;
 				msg = MessageParser.parseMsg(msgStream);
+				System.out.println(MessageGenerater.generate(msg));
 				
 				String responseXml = "";
 				Date now = new Date();
-				TextMessage responseMsg = new TextMessage();
-				if(msg!=null){
-					System.out.println("request: "+msg.getContent());
+				
+				if(msg.getMsgType().equals(MessageType.MSG_TYPE_TEXT)){
+				    TextMessageTo responseMsg = new TextMessageTo();
+				    
 				    responseMsg.setToUserName(msg.getFromUserName());
 				    responseMsg.setFromUserName(msg.getToUserName());
-				    responseMsg.setCreateTime(now.getTime()+"");
+				    responseMsg.setCreateTime(now.getTime());
 				    responseMsg.setMsgType(msg.getMsgType());
-				    responseMsg.setContent("Welcome");
+				    responseMsg.setContent("hi");
 				    responseXml = MessageGenerater.generate(responseMsg);
+					System.out.println("response: "+responseMsg.getContent());
+				}else if(msg.getMsgType().equals(MessageType.MSG_TYPE_PICTURE)){
+					PictureMessageTo responseMsg = new PictureMessageTo();
+				    responseMsg.setToUserName(msg.getFromUserName());
+				    responseMsg.setFromUserName(msg.getToUserName());
+				    responseMsg.setCreateTime(now.getTime());
+				    responseMsg.setMsgType(msg.getMsgType());
+				    PictureMessageTo.Image image = new PictureMessageTo.Image();
+				    image.setMediaId((((PictureMessageFrom)msg).getMediaId()));
+				    responseMsg.setImage(image);
+				    responseXml = MessageGenerater.generate(responseMsg);
+				}else if(msg.getMsgType().equals(MessageType.MSG_TYPE_VOICE)){
+					VoiceMessageTo responseMsg = new VoiceMessageTo();
+				    responseMsg.setToUserName(msg.getFromUserName());
+				    responseMsg.setFromUserName(msg.getToUserName());
+				    responseMsg.setCreateTime(now.getTime());
+				    responseMsg.setMsgType(msg.getMsgType());
+				    VoiceMessageTo.Voice voice = new VoiceMessageTo.Voice();
+				    voice.setMediaId(((VoiceMessageFrom)msg).getMediaId());
+				    responseMsg.setVoice(voice);
+				    responseXml = MessageGenerater.generate(responseMsg);
+				}else if(msg.getMsgType().equals(MessageType.MSG_TYPE_VIDEO)){
+					VideoMessageTo responseMsg = new VideoMessageTo();
+				    responseMsg.setToUserName(msg.getFromUserName());
+				    responseMsg.setFromUserName(msg.getToUserName());
+				    responseMsg.setCreateTime(now.getTime());
+				    responseMsg.setMsgType(msg.getMsgType());
+				    VideoMessageTo.Video video = new VideoMessageTo.Video();
+				    video.setTitle("Video");
+				    video.setDescription("amazing");
+				    video.setMediaId(((VideoMessageFrom)msg).getMediaId());
+				    responseMsg.setVideo(video);
+				    responseXml = MessageGenerater.generate(responseMsg);
+				}else if(msg.getMsgType().equals(MessageType.MSG_TYPE_LOCATION)){
+					TextMessageTo responseMsg = new TextMessageTo();
+				    responseMsg.setToUserName(msg.getFromUserName());
+				    responseMsg.setFromUserName(msg.getToUserName());
+				    responseMsg.setCreateTime(now.getTime());
+				    responseMsg.setMsgType(MessageType.MSG_TYPE_TEXT);
+				    responseMsg.setContent("SH in China");
+				    responseXml = MessageGenerater.generate(responseMsg);
+				}else if(msg.getMsgType().equals(MessageType.MSG_TYPE_LINK)){
+					TextMessageTo responseMsg = new TextMessageTo();
+				    responseMsg.setToUserName(msg.getFromUserName());
+				    responseMsg.setFromUserName(msg.getToUserName());
+				    responseMsg.setCreateTime(now.getTime());
+				    responseMsg.setMsgType(MessageType.MSG_TYPE_TEXT);
+				    responseMsg.setContent(((LinkMessageFrom)msg).getUrl());
+				    responseXml = MessageGenerater.generate(responseMsg);
+					System.out.println("response: "+responseMsg.getContent());
+				}else if(msg.getMsgType().equals(MessageType.MSG_TYPE_EVENT)){
+					if(((SubscribeMessage)msg).getEvent().equals(EventType.EVENT_TYPE_SUBSCRIBE)){
+						ImageAndTextMessageTo responseMsg = new ImageAndTextMessageTo();
+						List<ImageAndTextMessageTo.Article> articles = new ArrayList<ImageAndTextMessageTo.Article>();
+						ImageAndTextMessageTo.Article article = new ImageAndTextMessageTo.Article();
+						article.setTitle(new String("百货聘长腿男模帮女顾客试鞋".getBytes("UTF-8")));
+						article.setDescription("first description");
+						article.setPicUrl("http://r3.sinaimg.cn/2/2014/0601/e2/a/06484615/original.jpg");
+						article.setUrl("http://www.sina.cn/?vt=4");
+						articles.add(article);
+						
+						article = new ImageAndTextMessageTo.Article();
+						article.setTitle("深港澳车展美车模");
+						article.setDescription("beautiful girl");
+						article.setPicUrl("http://u1.sinaimg.cn/upload/2014/0530/17/549a9efc.jpg");
+						article.setUrl("http://www.sina.cn/?vt=4");
+						articles.add(article);
+						
+						responseMsg.setToUserName(msg.getFromUserName());
+						responseMsg.setFromUserName(msg.getToUserName());
+					    responseMsg.setCreateTime(now.getTime());
+					    responseMsg.setMsgType(MessageType.MSG_TYPE_NEWS);
+					    responseMsg.setArticleCount(articles.size());
+					    responseMsg.setArticles(articles);
+					    responseXml = MessageGenerater.generate(responseMsg);
+					}
 				}
 				
 				PrintWriter out = null;
 				out = response.getWriter();
 				out.print(responseXml);
-				System.out.println("response: "+responseMsg.getContent());
+				System.out.println(responseXml);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

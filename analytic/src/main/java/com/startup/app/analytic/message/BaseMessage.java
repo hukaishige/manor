@@ -1,19 +1,26 @@
 package com.startup.app.analytic.message;
 
+import java.util.Map;
+
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
-public class BaseMessage {
+public abstract class BaseMessage {
+	public final static String TO_USER_NAME ="ToUserName";
+	public final static String FROM_USER_NAME ="FromUserName";
+	public final static String CREATE_TIME ="CreateTime";
+	public final static String MSG_TYPE ="MsgType";
+	public final static String MSG_ID ="MsgId";
 
-	@XStreamAlias("ToUserName")
+	@XStreamAlias(TO_USER_NAME)
 	private String toUserName;
 	
-	@XStreamAlias("FromUserName")
+	@XStreamAlias(FROM_USER_NAME)
 	private String fromUserName;
 	
-	@XStreamAlias("CreateTime")
-	private String createTime;
+	@XStreamAlias(CREATE_TIME)
+	private long createTime;
 	
-	@XStreamAlias("MsgType")
+	@XStreamAlias(MSG_TYPE)
 	private String msgType;
 	
 	@XStreamAlias("MsgId")
@@ -35,11 +42,11 @@ public class BaseMessage {
 		this.fromUserName = fromUser;
 	}
 	
-	public String getCreateTime() {
+	public long getCreateTime() {
 		return createTime;
 	}
 	
-	public void setCreateTime(String createTime) {
+	public void setCreateTime(long createTime) {
 		this.createTime = createTime;
 	}
 	
@@ -59,5 +66,11 @@ public class BaseMessage {
 		this.msgId = msgId;
 	}
 	
-	
+	public void deserialize(Map<String, String> map){
+		toUserName=map.get(TO_USER_NAME);
+        fromUserName=map.get(FROM_USER_NAME);
+        createTime=Long.parseLong(map.get(CREATE_TIME));
+        msgType=map.get(MSG_TYPE);
+        msgId=map.get(MSG_ID);
+	}
 }

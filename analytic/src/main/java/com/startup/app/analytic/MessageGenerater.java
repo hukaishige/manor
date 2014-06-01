@@ -2,7 +2,9 @@ package com.startup.app.analytic;
 
 import java.io.Writer;
 
-import com.startup.app.analytic.message.TextMessage;
+import com.startup.app.analytic.message.BaseMessage;
+import com.startup.app.analytic.message.to.ImageAndTextMessageTo;
+import com.startup.app.analytic.message.to.TextMessageTo;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.core.util.QuickWriter;
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter;
@@ -26,6 +28,17 @@ public class MessageGenerater {
 						writer.write(text);
 					}
 				}
+				@Override
+				public void startNode(String name) {
+					super.startNode(name);
+					if(name.equals("ArticleCount")||name.equals("CreateTime")){
+						cdata = false;
+					}else{
+						cdata = true;
+					}
+				}
+				
+				
 			};
 		}
 
@@ -34,7 +47,7 @@ public class MessageGenerater {
 	});
 	
 	
-	public static String generate(TextMessage message){
+	public static String generate(BaseMessage message){
 		xstream.processAnnotations(message.getClass());
 		return xstream.toXML(message);
 	}
