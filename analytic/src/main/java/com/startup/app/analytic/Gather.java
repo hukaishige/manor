@@ -26,7 +26,6 @@ import com.startup.app.analytic.message.MessageType;
 import com.startup.app.analytic.message.from.LinkMessageFrom;
 import com.startup.app.analytic.message.from.PictureMessageFrom;
 import com.startup.app.analytic.message.from.SubscribeMessage;
-import com.startup.app.analytic.message.from.TextMessageFrom;
 import com.startup.app.analytic.message.from.VideoMessageFrom;
 import com.startup.app.analytic.message.from.VoiceMessageFrom;
 import com.startup.app.analytic.message.to.ImageAndTextMessageTo;
@@ -34,6 +33,8 @@ import com.startup.app.analytic.message.to.PictureMessageTo;
 import com.startup.app.analytic.message.to.TextMessageTo;
 import com.startup.app.analytic.message.to.VideoMessageTo;
 import com.startup.app.analytic.message.to.VoiceMessageTo;
+import com.startup.app.analytic.utils.MessageGenerater;
+import com.startup.app.analytic.utils.MessageParser;
 
 @RestController
 @RequestMapping("/service")
