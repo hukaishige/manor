@@ -10,9 +10,12 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 import com.startup.app.analytic.message.BaseMessage;
+import com.startup.app.analytic.message.Event;
+import com.startup.app.analytic.message.EventType;
 import com.startup.app.analytic.message.MessageType;
 import com.startup.app.analytic.message.from.LinkMessageFrom;
 import com.startup.app.analytic.message.from.LocationMessageFrom;
+import com.startup.app.analytic.message.from.MenuEvent;
 import com.startup.app.analytic.message.from.PictureMessageFrom;
 import com.startup.app.analytic.message.from.SubscribeMessage;
 import com.startup.app.analytic.message.from.TextMessageFrom;
@@ -71,9 +74,16 @@ public class MessageParser{
 			
 	        return msg;
 		}else if(type.equals(MessageType.MSG_TYPE_EVENT)){
-			SubscribeMessage msg = new SubscribeMessage();
-			msg.deserialize(map);
-			return msg;
+			String event = map.get(Event.EVENT);
+			if(event.equals(EventType.EVENT_TYPE_SUBSCRIBE)){
+			    SubscribeMessage msg = new SubscribeMessage();
+			    msg.deserialize(map);
+			    return msg;
+			}else if(event.equals(EventType.EVENT_TYPE_MENU_CLICK)||event.equals(EventType.EVENT_TYPE_MENU_VIEW)){
+				MenuEvent msg = new MenuEvent();
+			    msg.deserialize(map);
+			    return msg;
+			}
 		}
 		
 		return null;

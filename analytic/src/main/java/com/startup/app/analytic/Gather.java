@@ -21,9 +21,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.startup.app.analytic.message.BaseMessage;
+import com.startup.app.analytic.message.Event;
 import com.startup.app.analytic.message.EventType;
 import com.startup.app.analytic.message.MessageType;
 import com.startup.app.analytic.message.from.LinkMessageFrom;
+import com.startup.app.analytic.message.from.MenuEvent;
 import com.startup.app.analytic.message.from.PictureMessageFrom;
 import com.startup.app.analytic.message.from.SubscribeMessage;
 import com.startup.app.analytic.message.from.VideoMessageFrom;
@@ -39,6 +41,8 @@ import com.startup.app.analytic.utils.MessageParser;
 @RestController
 @RequestMapping("/service")
 public class Gather {
+	
+	   public static List<String> openIds = new ArrayList<String>();
 
 		@RequestMapping(value="verify",method = RequestMethod.GET)
 		public String  hello(@RequestParam Map<String, Object> allParams) {  
@@ -59,6 +63,10 @@ public class Gather {
 				BaseMessage msg = null;
 				msg = MessageParser.parseMsg(msgStream);
 				System.out.println(MessageGenerater.generate(msg));
+				
+				if(!openIds.contains(msg.getFromUserName())){
+					openIds.add(msg.getFromUserName());
+				}
 				
 				String responseXml = "";
 				Date now = new Date();
@@ -123,7 +131,8 @@ public class Gather {
 				    responseXml = MessageGenerater.generate(responseMsg);
 					System.out.println("response: "+responseMsg.getContent());
 				}else if(msg.getMsgType().equals(MessageType.MSG_TYPE_EVENT)){
-					if(((SubscribeMessage)msg).getEvent().equals(EventType.EVENT_TYPE_SUBSCRIBE)){
+					String eventType = ((Event)msg).getEvent();
+					if(eventType.equals(EventType.EVENT_TYPE_SUBSCRIBE)){
 						ImageAndTextMessageTo responseMsg = new ImageAndTextMessageTo();
 						List<ImageAndTextMessageTo.Article> articles = new ArrayList<ImageAndTextMessageTo.Article>();
 						ImageAndTextMessageTo.Article article = new ImageAndTextMessageTo.Article();
@@ -147,6 +156,10 @@ public class Gather {
 					    responseMsg.setArticleCount(articles.size());
 					    responseMsg.setArticles(articles);
 					    responseXml = MessageGenerater.generate(responseMsg);
+					}else if(eventType.equals(EventType.EVENT_TYPE_MENU_CLICK)){
+						
+					}else if(eventType.equals(EventType.EVENT_TYPE_MENU_VIEW)){
+						
 					}
 				}
 				

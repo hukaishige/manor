@@ -9,4 +9,5 @@ public class Constants {
 	public final static String POST_UPLOAD_URL="http://file.api.weixin.qq.com/cgi-bin/media/upload";
 	public final static String GET_DOWNLOAD_URL="http://file.api.weixin.qq.com/cgi-bin/media/get";
 	public final static String POST_MENU_URL="https://api.weixin.qq.com/cgi-bin/menu/create";
+	public final static String POST_MESSAGE_URL="https://api.weixin.qq.com/cgi-bin/message/custom/send";
 }
