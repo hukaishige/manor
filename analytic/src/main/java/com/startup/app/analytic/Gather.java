@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.Consts;
 import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -78,7 +79,7 @@ public class Gather {
 				    responseMsg.setFromUserName(msg.getToUserName());
 				    responseMsg.setCreateTime(now.getTime());
 				    responseMsg.setMsgType(msg.getMsgType());
-				    responseMsg.setContent("hi");
+				    responseMsg.setContent("你好");
 				    responseXml = MessageGenerater.generate(responseMsg);
 					System.out.println("response: "+responseMsg.getContent());
 				}else if(msg.getMsgType().equals(MessageType.MSG_TYPE_PICTURE)){
@@ -136,7 +137,7 @@ public class Gather {
 						ImageAndTextMessageTo responseMsg = new ImageAndTextMessageTo();
 						List<ImageAndTextMessageTo.Article> articles = new ArrayList<ImageAndTextMessageTo.Article>();
 						ImageAndTextMessageTo.Article article = new ImageAndTextMessageTo.Article();
-						article.setTitle(new String("百货聘长腿男模帮女顾客试鞋".getBytes("UTF-8")));
+						article.setTitle(new String("百货聘长腿男模帮女顾客试鞋"));
 						article.setDescription("first description");
 						article.setPicUrl("http://r3.sinaimg.cn/2/2014/0601/e2/a/06484615/original.jpg");
 						article.setUrl("http://www.sina.cn/?vt=4");

@@ -40,6 +40,7 @@ import org.codehaus.jackson.map.util.JSONPObject;
 import com.startup.app.analytic.message.AccessToken;
 import com.startup.app.analytic.message.Menu;
 import com.startup.app.analytic.message.MenuItem;
+import com.startup.app.analytic.message.MessageType;
 import com.startup.app.analytic.message.to.PostTextMessage;
 import com.startup.app.analytic.message.to.TextMessageTo;
 import com.startup.app.analytic.utils.MessageGenerater;
@@ -171,8 +172,8 @@ public class AdminController {
 
 	}
 
-	@RequestMapping(value = "message/send", method = RequestMethod.GET)
-	public String sendMessage() {
+	@RequestMapping(value = "text/send", method = RequestMethod.GET)
+	public String sendTextMessage() {
 		if (token == null) {
 			token = Util.requireAccessToken();
 		}
@@ -184,15 +185,16 @@ public class AdminController {
 		for (String openId : Gather.openIds) {
 			PostTextMessage msg = new PostTextMessage();
 			msg.setToUser(openId);
+			msg.setMsgType(MessageType.MSG_TYPE_TEXT);
 			PostTextMessage.Text text = new PostTextMessage.Text();
-			text.setContent("service u");
+			text.setContent("很高兴为您服雾");
 			msg.setText(text);
 
 			ObjectMapper mapper = new ObjectMapper();
 			mapper.setSerializationInclusion(Inclusion.NON_NULL);
 			try {
-				String menuString = mapper.writeValueAsString(msg);
-				post.setEntity(new StringEntity(menuString, Consts.UTF_8));
+				String msgString = mapper.writeValueAsString(msg);
+				post.setEntity(new StringEntity(msgString, Consts.UTF_8));
 
 				HttpResponse response = client.execute(post);
 
@@ -206,6 +208,36 @@ public class AdminController {
 			} catch (JsonMappingException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		
+		return "ok";
+	}
+	
+	@RequestMapping(value = "article/send", method = RequestMethod.GET)
+	public String sendArfticleMessage() {
+		if (token == null) {
+			token = Util.requireAccessToken();
+		}
+
+		StringBuilder url = new StringBuilder(Constants.POST_MESSAGE_URL);
+		url.append("?access_token=" + token.getAccess_token());
+		HttpClient client = new DefaultHttpClient();
+		HttpPost post = new HttpPost(url.toString());
+		for (String openId : Gather.openIds) {
+			try {
+				String msgString = Util.generateArticle(openId);
+				post.setEntity(new StringEntity(msgString, Consts.UTF_8));
+
+				HttpResponse response = client.execute(post);
+
+				HttpEntity entity = response.getEntity();
+
+				String body = EntityUtils.toString(entity, Consts.UTF_8);
+				System.out.println(body);
+
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
